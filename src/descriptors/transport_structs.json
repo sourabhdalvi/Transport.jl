@@ -1,0 +1,97 @@
+[
+    {
+      "struct_name": "Market",
+      "docstring": "Stores information regarding markets in Transport model",
+      "fields": [
+        {
+          "name": "name",
+          "comment": "the name of the market",
+          "null_value": "init",
+          "data_type": "String"
+        },
+        {
+          "name": "demand",
+          "comment": "demand for the market",
+          "null_value": "0.0",
+          "data_type": "Float64",
+          "valid_range": {
+              "min": 0,
+              "max": null
+            },
+          "validation_action": "warn"
+        }
+      ],
+      "supertype": "MarketData"
+    },
+    {
+      "struct_name": "Plant",
+      "docstring": "Stores information regarding canning plants in Transport model",
+      "fields": [
+        {
+          "name": "name",
+          "comment": "the name of the plant",
+          "null_value": "init",
+          "data_type": "String"
+        },
+        {
+          "name": "capacity",
+          "comment": "stores the canning capacity for the plant",
+          "null_value": "0.0",
+          "data_type": "Float64",
+          "valid_range": {
+              "min": 0,
+              "max": null
+            },
+          "validation_action": "warn"
+        }
+      ],
+      "supertype": "PlantData"
+    },
+    {
+      "struct_name": "RoadLink",
+      "docstring": "Stores information regarding the distance between plants and",
+      "fields": [
+        {
+          "name": "name",
+          "comment": "the name of the link",
+          "null_value": "init",
+          "data_type": "String"
+        },
+        {
+          "name": "market",
+          "comment": "stores the market that road link connects to",
+          "null_value": "Market(nothing)",
+          "data_type": "Market"
+        },
+        {
+          "name": "plant",
+          "comment": "stores the plant that road link connects to",
+          "null_value": "Plant(nothing)",
+          "data_type": "Plant"
+        },
+        {
+          "name": "distance",
+          "comment": "stores the distance between market and plant",
+          "null_value": "0.0",
+          "data_type": "Float64",
+          "valid_range": {
+              "min": 0,
+              "max": null
+            },
+          "validation_action": "warn"
+        },
+        {
+            "name": "cost",
+            "comment": "stores the cost of using the road link",
+            "null_value": "0.0",
+            "data_type": "Float64",
+            "valid_range": {
+                "min": 0,
+                "max": null
+              },
+            "validation_action": "warn"
+          }
+      ],
+      "supertype": "LinkData"
+    }
+]
