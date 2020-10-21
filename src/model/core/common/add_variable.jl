@@ -22,3 +22,27 @@ function add_variable!(
 
     return
 end
+
+function add_variable!(
+    jump_container::JuMPContainer,
+    component::Vector{<:TransportComponent},
+    var_name::Symbol,
+    binary::Bool,
+    kwargs...,
+)
+    @assert !isempty(component)
+    name_set = unique([get_name(c) for c in component])
+    variable = add_var_container!(jump_container, var_name, name_set)
+
+    for c in name_set
+        variable[c] = JuMP.@variable(
+            jump_container.JuMPmodel,
+            base_name = "$(var_name)_{$(c)}",
+            binary = binary
+        )
+
+        JuMP.set_lower_bound(variable[c], 0.0)
+    end
+
+    return
+end

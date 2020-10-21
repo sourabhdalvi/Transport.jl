@@ -56,9 +56,9 @@ export ShipmentQuantities
 export SupplyBalance
 export DemandBalance
 
-
 ## Imports
 import JuMP
+import Complementarity
 
 ## Includes
 

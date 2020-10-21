@@ -24,6 +24,41 @@
       "supertype": "MarketData"
     },
     {
+        "struct_name": "FlexibleMarket",
+        "docstring": "Stores information regarding markets in Transport model",
+        "fields": [
+          {
+            "name": "name",
+            "comment": "the name of the market",
+            "null_value": "init",
+            "data_type": "String"
+          },
+          {
+            "name": "demand",
+            "comment": "demand for the market",
+            "null_value": "0.0",
+            "data_type": "Float64",
+            "valid_range": {
+                "min": 0,
+                "max": null
+              },
+            "validation_action": "warn"
+          },
+          {
+            "name": "price_elasticity",
+            "comment": "price elasticity of demand (at prices equal to unity)",
+            "null_value": "0.0",
+            "data_type": "Float64",
+            "valid_range": {
+                "min": 0,
+                "max": null
+              },
+            "validation_action": "warn"
+          }
+        ],
+        "supertype": "MarketData"
+      },
+    {
       "struct_name": "Plant",
       "docstring": "Stores information regarding canning plants in Transport model",
       "fields": [
@@ -61,13 +96,13 @@
           "name": "market",
           "comment": "stores the market that road link connects to",
           "null_value": "Market(nothing)",
-          "data_type": "Market"
+          "data_type": "MarketData"
         },
         {
           "name": "plant",
           "comment": "stores the plant that road link connects to",
           "null_value": "Plant(nothing)",
-          "data_type": "Plant"
+          "data_type": "PlantData"
         },
         {
           "name": "distance",

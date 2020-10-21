@@ -24,17 +24,41 @@ get_constraint(jump_container::JuMPContainer, name::Symbol) =
 get_expression(jump_container::JuMPContainer, name::Symbol) =
     jump_container.expressions[name]
 
-function jump_container_init!(jump_container::JuMPContainer, dataset::DataSet)
-    _make_expressions_dict!(jump_container, dataset)
+function jump_container_init!(
+    jump_container::JuMPContainer,
+    formulation::Type{<:TransportFormulation},
+    dataset::DataSet,
+)
+    _make_expressions_dict!(jump_container, dataset, formulation)
     return
 end
 
-function _make_expressions_dict!(jump_container::JuMPContainer, dataset::DataSet)
+function _make_expressions_dict!(
+    jump_container::JuMPContainer,
+    dataset::DataSet,
+    formulation::Type{<:TransportFormulation},
+)
     _markets = [get_name(m) for m in get_components(dataset, Market)]
     _plants = [get_name(p) for p in get_components(dataset, Plant)]
     jump_container.expressions = DenseAxisArrayContainer(
         SupplyBalance => JuMP.Containers.DenseAxisArray{GAE}(undef, _plants),
         DemandBalance => JuMP.Containers.DenseAxisArray{GAE}(undef, _markets),
+    )
+    return
+end
+
+function _make_expressions_dict!(
+    jump_container::JuMPContainer,
+    dataset::DataSet,
+    formulation::Type{<:TransportMCPFormulation},
+)
+    _markets = [get_name(m) for m in get_components(dataset, FlexibleMarket)]
+    _plants = [get_name(p) for p in get_components(dataset, Plant)]
+    jump_container.expressions = DenseAxisArrayContainer(
+        SupplyBalance =>
+            JuMP.Containers.DenseAxisArray{JuMP.NonlinearExpression}(undef, _plants),
+        DemandBalance =>
+            JuMP.Containers.DenseAxisArray{JuMP.NonlinearExpression}(undef, _markets),
     )
     return
 end
@@ -97,6 +121,12 @@ end
 
 function add_expression_container!(psi_container::JuMPContainer, exp_name::Symbol, axs...)
     container = JuMP.Containers.DenseAxisArray{JuMP.GenericAffExpr}(undef, axs...)
+    assign_expression!(psi_container, exp_name, container)
+    return container
+end
+
+function add_NLexpression_container!(psi_container::JuMPContainer, exp_name::Symbol, axs...)
+    container = JuMP.Containers.DenseAxisArray{JuMP.NonlinearExpression}(undef, axs...)
     assign_expression!(psi_container, exp_name, container)
     return container
 end

@@ -35,6 +35,22 @@ function DataSet(
     return data
 end
 
+function DataSet(
+    canning_plants::Vector{String},
+    markets::Vector{String},
+    plant_capacity::Dict{String, T},
+    market_demand::Dict{String, T},
+    elasticity::Dict{String, T},
+    distance::Dict{Tuple{String, String}, T},
+    freight_cost::T,
+) where {T <: Real}
+    data = DataSet()
+    add_plants!(data, canning_plants, plant_capacity)
+    add_markets!(data, markets, market_demand, elasticity)
+    add_roadlinks!(data, distance, freight_cost)
+    return data
+end
+
 function add_plants!(
     data::DataSet,
     canning_plants::Vector{String},
@@ -59,6 +75,19 @@ function add_markets!(
     add_to_dataset!(data, markets_struct)
 end
 
+function add_markets!(
+    data::DataSet,
+    markets::Vector{String},
+    market_demand::Dict{String, T},
+    elasticity::Dict{String, T},
+) where {T <: Real}
+    markets_struct = Dict{String, FlexibleMarket}()
+    for m in markets
+        markets_struct[m] = FlexibleMarket(m, market_demand[m], elasticity[m])
+    end
+    add_to_dataset!(data, markets_struct)
+end
+
 function add_roadlinks!(
     data::DataSet,
     distance::Dict{Tuple{String, String}, T},
@@ -67,8 +96,8 @@ function add_roadlinks!(
     roadlink_struct = Dict{String, RoadLink}()
     for ((p, m), dist) in distance
         name = "$(p)_$m"
-        plant = get_component_by_name(data, Plant, p)
-        market = get_component_by_name(data, Market, m)
+        plant = get_component_by_name(data, PlantData, p)
+        market = get_component_by_name(data, MarketData, m)
         roadlink_struct[name] =
             RoadLink(name, market, plant, dist, freight_cost * dist / 1000)
     end
@@ -94,13 +123,24 @@ function get_component_by_name(
     name::String,
 )
     data = get_data(dataset)
-    if haskey(data, type)
-        if haskey(data[type], name)
-            return data[type][name]
-        else
-            error("No components with name $(name) found in dataset for type $(type)")
+    if Base.isabstracttype(type)
+        for (k_type, component_dict) in data
+            if k_type <: type
+                if haskey(component_dict, name)
+                    return component_dict[name]
+                end
+            end
         end
     else
-        error("No components of type $(type) found in dataset")
+        if haskey(data, type)
+            if haskey(data[type], name)
+                return data[type][name]
+            else
+                error("No components with name $(name) found in dataset for type $(type)")
+            end
+        else
+            error("No components of type $(type) found in dataset")
+        end
     end
+    return error("No components with name $(name) found in dataset for type $(type)")
 end

@@ -4,8 +4,8 @@ This file is auto-generated. Do not edit.
 """
     mutable struct RoadLink <: LinkData
         name::String
-        market::Market
-        plant::Plant
+        market::MarketData
+        plant::PlantData
         distance::Float64
         cost::Float64
     end
@@ -14,8 +14,8 @@ Stores information regarding the distance between plants and
 
 # Arguments
 - `name::String`: the name of the link
-- `market::Market`: stores the market that road link connects to
-- `plant::Plant`: stores the plant that road link connects to
+- `market::MarketData`: stores the market that road link connects to
+- `plant::PlantData`: stores the plant that road link connects to
 - `distance::Float64`: stores the distance between market and plant, validation range: `(0, nothing)`, action if invalid: `warn`
 - `cost::Float64`: stores the cost of using the road link, validation range: `(0, nothing)`, action if invalid: `warn`
 """
@@ -23,9 +23,9 @@ mutable struct RoadLink <: LinkData
     "the name of the link"
     name::String
     "stores the market that road link connects to"
-    market::Market
+    market::MarketData
     "stores the plant that road link connects to"
-    plant::Plant
+    plant::PlantData
     "stores the distance between market and plant"
     distance::Float64
     "stores the cost of using the road link"
