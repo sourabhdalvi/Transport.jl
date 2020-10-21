@@ -32,8 +32,13 @@ function mcp_balance_constraint!(
         name = get_name(p)
 
         # Figure out a way to store complementarity constraint ref
-        # Currently @complementarity returns a Array{ComplementarityType,1}
-        Complementarity.@complementarity(jump_container.JuMPmodel, exp[name], var[name])
+        # Currently `get_MCP_data(m)`  stores the reference to the complementarity constraint
+        Complementarity.add_complementarity(
+            jump_container.JuMPmodel,
+            var[name],
+            exp[name],
+            String(constraint_name),
+        )
     end
     return
 end

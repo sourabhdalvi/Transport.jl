@@ -33,7 +33,7 @@ function add_variables_to_NLexpression!(
     exp = get_expression(jump_container, expression_name)
     for p in plants
         name = get_name(p)
-        capacity  = get_capacity(p)
+        capacity = get_capacity(p)
         exp[name] = JuMP.@NLexpression(
             jump_container.JuMPmodel,
             capacity - sum(sign * v for v in variable[name, :])
@@ -77,7 +77,7 @@ function add_variables_to_NLexpression!(
     exp = get_expression(jump_container, expression_name)
     for m in markets
         name = get_name(m)
-        demand  = get_demand(m)
+        demand = get_demand(m)
         exp[name] = JuMP.@NLexpression(
             jump_container.JuMPmodel,
             sum(sign * v for v in variable[:, name]) - demand

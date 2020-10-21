@@ -41,17 +41,19 @@ function mcp_profit_constraint!(
     for r in roadlinks
         plant = get_plant_name(r)
         market = get_market_name(r)
+        cost = get_cost(r)
         exp[plant, market] = JuMP.@NLexpression(
             jump_container.JuMPmodel,
-            var_w[plant] + get_cost(r) - var_p[market]
+            var_w[plant] + cost - var_p[market]
         )
 
         # Figure out a way to store complementarity constraint ref
-        # Currently @complementarity returns a Array{ComplementarityType,1}
-        Complementarity.@complementarity(
+        # Currently `get_MCP_data(m)`  stores the reference to the complementarity constraint
+        Complementarity.add_complementarity(
             jump_container.JuMPmodel,
+            var_x[plant, market],
             exp[plant, market],
-            var_x[plant, market]
+            String(constraint_name),
         )
     end
     return

@@ -69,6 +69,9 @@ function _build!(
     markets = get_components(dataset, FlexibleMarket)
     construct_markets!(jump_container, markets, formulation)
 
+    @debug "Adding Complementarity Conditions with $formulation"
+    construct_complementarity_conditions!(jump_container, dataset, formulation)
+
     @debug "Building Objective"
     JuMP.@objective(
         jump_container.JuMPmodel,
@@ -82,7 +85,6 @@ function solve!(
     t_problem::TransportProblem{T};
     kwargs...,
 ) where {T <: AbstractTransportProblem}
-
     timed_log = Dict{Symbol, Any}()
     if t_problem.jump_container.JuMPmodel.moi_backend.state == JuMP.MOIU.NO_OPTIMIZER
         if !(:optimizer in keys(kwargs))
@@ -101,9 +103,12 @@ function solve!(
     t_problem::TransportProblem{T};
     kwargs...,
 ) where {T <: AbstractMCPTransportProblem}
-
     timed_log = Dict{Symbol, Any}()
-    Complementarity.PATHSolver.options(convergence_tolerance=1e-8, output=:yes, time_limit=3600)
+    Complementarity.PATHSolver.options(
+        convergence_tolerance = 1e-8,
+        output = :yes,
+        time_limit = 3600,
+    )
     model_status = Complementarity.solveMCP(t_problem.jump_container.JuMPmodel)
     return model_status
 end
@@ -115,7 +120,7 @@ function construct_complementarity_conditions!(
 )
     road_links = get_components(dataset, RoadLink)
     plants = get_components(dataset, Plant)
-    markets = get_components(dataset, Market)
+    markets = get_components(dataset, FlexibleMarket)
 
     mcp_balance_constraint!(
         jump_container,

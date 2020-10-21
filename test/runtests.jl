@@ -48,8 +48,12 @@ dataset_mcp = DataSet(
     distance,
     freight_cost,
 )
-t_mcpproblem = TR.TransportProblem(GenericMCPProblem, dataset_mcp, TR.BasicMCPFormulation, TR.Complementarity.MCPModel());
+t_mcpproblem = TR.TransportProblem(
+    GenericMCPProblem,
+    dataset_mcp,
+    TR.BasicMCPFormulation,
+    TR.Complementarity.MCPModel(),
+);
 TR.solve!(t_mcpproblem)
-
 
 ############## MCP with Elastic Demand Example ################

@@ -23,7 +23,7 @@ function mcp_balance_constraint!(
     constraint_name::Symbol,
     variable_name::Symbol,
 )
-    set_name = [get_name(p) for p in markets]
+    # set_name = [get_name(p) for p in markets]
     exp = get_expression(jump_container, constraint_name)
     var = get_variable(jump_container, variable_name)
     # con = add_cons_container!(jump_container, constraint_name, set_name)
@@ -32,8 +32,13 @@ function mcp_balance_constraint!(
         name = get_name(m)
 
         # Figure out a way to store complementarity constraint ref
-        # Currently @complementarity returns a Array{ComplementarityType,1}
-        Complementarity.@complementarity(jump_container.JuMPmodel, exp[name], var[name])
+        # Currently `get_MCP_data(m)`  stores the reference to the complementarity constraint
+        Complementarity.add_complementarity(
+            jump_container.JuMPmodel,
+            var[name],
+            exp[name],
+            String(constraint_name),
+        )
     end
     return
 end
