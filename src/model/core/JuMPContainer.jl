@@ -63,8 +63,8 @@ function _make_expressions_dict!(
     return
 end
 
-function get_variable_names(psi_container::JuMPContainer)
-    return collect(keys(psi_container.variables))
+function get_variable_names(jump_container::JuMPContainer)
+    return collect(keys(jump_container.variables))
 end
 
 """ Returns the correct container spec for the selected type of JuMP Model"""
@@ -79,97 +79,97 @@ function sparse_container_spec(m::M, axs...) where {M <: JuMP.AbstractModel}
     return JuMP.Containers.SparseAxisArray(contents)
 end
 
-function assign_variable!(psi_container::JuMPContainer, name::Symbol, value)
+function assign_variable!(jump_container::JuMPContainer, name::Symbol, value)
     @debug "assign_variable" name
 
-    if haskey(psi_container.variables, name)
-        error("variable $name is already stored", sort!(get_variable_names(psi_container)))
+    if haskey(jump_container.variables, name)
+        error("variable $name is already stored", sort!(get_variable_names(jump_container)))
     end
 
-    psi_container.variables[name] = value
+    jump_container.variables[name] = value
     return
 end
 
 function add_var_container!(
-    psi_container::JuMPContainer,
+    jump_container::JuMPContainer,
     var_name::Symbol,
     axs...;
     sparse = false,
 )
     if sparse
-        container = sparse_container_spec(psi_container.JuMPmodel, axs...)
+        container = sparse_container_spec(jump_container.JuMPmodel, axs...)
     else
-        container = container_spec(psi_container.JuMPmodel, axs...)
+        container = container_spec(jump_container.JuMPmodel, axs...)
     end
-    assign_variable!(psi_container, var_name, container)
+    assign_variable!(jump_container, var_name, container)
     return container
 end
 
-function assign_expression!(psi_container::JuMPContainer, name::Symbol, value)
+function assign_expression!(jump_container::JuMPContainer, name::Symbol, value)
     @debug "set_expression" name
 
-    if haskey(psi_container.expressions, name)
+    if haskey(jump_container.expressions, name)
         error(
             "expression $name is already stored",
-            sort!(get_variable_names(psi_container)),
+            sort!(get_variable_names(jump_container)),
         )
     end
 
-    psi_container.expressions[name] = value
+    jump_container.expressions[name] = value
     return
 end
 
-function add_expression_container!(psi_container::JuMPContainer, exp_name::Symbol, axs...)
+function add_expression_container!(jump_container::JuMPContainer, exp_name::Symbol, axs...)
     container = JuMP.Containers.DenseAxisArray{JuMP.GenericAffExpr}(undef, axs...)
-    assign_expression!(psi_container, exp_name, container)
+    assign_expression!(jump_container, exp_name, container)
     return container
 end
 
-function add_NLexpression_container!(psi_container::JuMPContainer, exp_name::Symbol, axs...)
+function add_NLexpression_container!(jump_container::JuMPContainer, exp_name::Symbol, axs...)
     container = JuMP.Containers.DenseAxisArray{JuMP.NonlinearExpression}(undef, axs...)
-    assign_expression!(psi_container, exp_name, container)
+    assign_expression!(jump_container, exp_name, container)
     return container
 end
 
-function assign_constraint!(psi_container::JuMPContainer, name::Symbol, value)
+function assign_constraint!(jump_container::JuMPContainer, name::Symbol, value)
     @debug "set_constraint" name
 
-    if haskey(psi_container.constraints, name)
+    if haskey(jump_container.constraints, name)
         error(
             "constraint $name is already stored",
-            sort!(get_variable_names(psi_container)),
+            sort!(get_variable_names(jump_container)),
         )
     end
 
-    psi_container.constraints[name] = value
+    jump_container.constraints[name] = value
     return
 end
 
 function add_cons_container!(
-    psi_container::JuMPContainer,
+    jump_container::JuMPContainer,
     cons_name::Symbol,
     axs...;
     sparse = false,
 )
     if sparse
-        container = sparse_container_spec(psi_container.JuMPmodel, axs...)
+        container = sparse_container_spec(jump_container.JuMPmodel, axs...)
     else
         container = JuMPConstraintArray(undef, axs...)
     end
-    assign_constraint!(psi_container, cons_name, container)
+    assign_constraint!(jump_container, cons_name, container)
     return container
 end
 
 function add_to_cost_expression!(
-    psi_container::JuMPContainer,
+    jump_container::JuMPContainer,
     cost_expression::JuMP.AbstractJuMPScalar,
 )
     T_ce = typeof(cost_expression)
-    T_cf = typeof(psi_container.cost_function)
+    T_cf = typeof(jump_container.cost_function)
     if T_cf <: JuMP.GenericAffExpr && T_ce <: JuMP.GenericQuadExpr
-        psi_container.cost_function += cost_expression
+        jump_container.cost_function += cost_expression
     else
-        JuMP.add_to_expression!(psi_container.cost_function, cost_expression)
+        JuMP.add_to_expression!(jump_container.cost_function, cost_expression)
     end
     return
 end

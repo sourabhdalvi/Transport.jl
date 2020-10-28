@@ -9,7 +9,7 @@ end
 
 function construct_markets!(
     jump_container::JuMPContainer,
-    markets::Vector{FlexibleMarket},
+    markets::Vector{<:MarketData},
     formulation::Type{<:TransportMCPFormulation},
 )
     add_variable!(jump_container, markets, DemandPrice, false)
